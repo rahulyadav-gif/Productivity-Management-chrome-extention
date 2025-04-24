@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Settings - Productivity Manager</title>
+  <link rel="stylesheet" href="styles/popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Settings</h1>
+    <div class="settings-section">
+      <h2>Productivity Settings</h2>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="tracking-enabled">
+          Enable Activity Tracking
+        </label>
+      </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="notifications-enabled">
+          Enable Notifications
+        </label>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h2>Focus Mode</h2>
+      <div class="setting-item">
+        <label>
+          Focus Session Duration (minutes):
+          <input type="number" id="focus-duration" min="5" max="120" value="25">
+        </label>
+      </div>
+    </div>
+    <button id="save-settings">Save Settings</button>
+  </div>
+  <script src="scripts/settings.js"></script>
+</body>
+</html> 

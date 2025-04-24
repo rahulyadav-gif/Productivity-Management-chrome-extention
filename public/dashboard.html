@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Productivity Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-card h3 {
+            margin-top: 0;
+            color: #666;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .top-sites {
+            margin-top: 30px;
+        }
+        .site-list {
+            list-style: none;
+            padding: 0;
+        }
+        .site-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+    <div class="container">
+        <h1>Productivity Dashboard</h1>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3>Productivity Score</h3>
+                <div id="productivity-score" class="stat-value">0%</div>
+            </div>
+            <div class="stat-card">
+                <h3>Time Tracked Today</h3>
+                <div id="time-tracked" class="stat-value">0h 0m</div>
+            </div>
+        </div>
+
+        <div class="top-sites">
+            <h2>Top Sites Today</h2>
+            <ul id="top-sites-list" class="site-list">
+                <li class="site-item">Loading...</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Fetch dashboard data
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('http://localhost:5000/api/activity/today', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+
+                const data = await response.json();
+                updateDashboard(data);
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+            }
+        }
+
+        function updateDashboard(data) {
+            // Calculate productivity score (example calculation)
+            const productiveTime = data.reduce((sum, activity) => {
+                return sum + (activity.isProductive ? activity.timeSpent : 0);
+            }, 0);
+            const totalTime = data.reduce((sum, activity) => sum + activity.timeSpent, 0);
+            const score = totalTime > 0 ? Math.round((productiveTime / totalTime) * 100) : 0;
+
+            // Update UI
+            document.getElementById('productivity-score').textContent = `${score}%`;
+            document.getElementById('time-tracked').textContent = formatTime(totalTime);
+
+            // Update top sites
+            const topSites = data
+                .sort((a, b) => b.timeSpent - a.timeSpent)
+                .slice(0, 5);
+
+            document.getElementById('top-sites-list').innerHTML = topSites
+                .map(site => `
+                    <li class="site-item">
+                        <span>${site.domain}</span>
+                        <span>${formatTime(site.timeSpent)}</span>
+                    </li>
+                `)
+                .join('') || '<li class="site-item">No activity recorded today</li>';
+        }
+
+        function formatTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours}h ${mins}m`;
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
+
+        // Initial load
+        fetchDashboardData();
+        // Refresh every minute
+        setInterval(fetchDashboardData, 60000);
+    </script>
+</body>
+</html> 
