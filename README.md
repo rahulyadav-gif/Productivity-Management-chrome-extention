@@ -104,3 +104,9 @@ Development Considerations:
 - Flash messages for user feedback
 - Responsive design for multiple devices
 This project demonstrates a comprehensive understanding of full-stack web development principles, incorporating user authentication, database management, and frontend design while maintaining security best practices and providing a smooth user experience.
+
+
+#0utput
+![Image](https://github.com/user-attachments/assets/50a4d6f2-7843-487e-a766-fee5ec35b21c)
+![Image](https://github.com/user-attachments/assets/b65be9e5-facf-4d4e-96af-254487cf9f52)
+
